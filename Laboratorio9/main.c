@@ -17,6 +17,8 @@
 #include "driverlib/timer.h"
 #define XTAL 16000000
 
+uint8_t Flag;
+
 void delayMs(uint32_t);
 void semaforo(void);
 
@@ -30,8 +32,7 @@ void main(void)
     SysCtlPeripheralEnable(TIMER0_BASE);
 
     while(1){
-
-    semaforo();
+     semaforo();
 
 
     }
@@ -39,27 +40,27 @@ void main(void)
 
 void semaforo(void){
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x08);
-    SysCtlDelay(50000000);
+    delayMs(5000);
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x00);
-    SysCtlDelay(20000000);
+    delayMs(1000);
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x08);
-    SysCtlDelay(20000000);
+    delayMs(1000);
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x00);
-    SysCtlDelay(20000000);
+    delayMs(1000);
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x08);
-    SysCtlDelay(20000000);
+    delayMs(1000);
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x00);
-    SysCtlDelay(20000000);
+    delayMs(1000);
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x08);
-    SysCtlDelay(20000000);
+    delayMs(1000);
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x00);
-    SysCtlDelay(20000000);
+    delayMs(1000);
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x0A);
-    SysCtlDelay(30000000);
+    delayMs(1000);
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x00);
-    SysCtlDelay(20000000);
+    delayMs(1000);
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x02);
-    SysCtlDelay(50000000);
+    delayMs(1000);
 
 }
 
