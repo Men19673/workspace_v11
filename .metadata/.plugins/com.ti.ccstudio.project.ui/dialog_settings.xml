@@ -15,4 +15,7 @@
 			<item key="CCS.RUNTIME_SUPPORT_LIB" value="null"/>
 		</section>
 	</section>
+	<section name="CCE.ImportMacrosWizard">
+		<item key="MacrosFileSelectionPage.BROWSE_FILTER" value="C:\Users\diego\workspace_v11\vars.ini"/>
+	</section>
 </section>
