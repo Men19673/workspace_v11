@@ -33,7 +33,6 @@
 /*************************************Declaracion de funciones ***********************************************/
 void delayMs(uint32_t);
 void semaforo(void);
-void PortFIntHandler(void);
 void PortDIntHandler(void);
 //void UART1IntHandler(void);
 
@@ -55,10 +54,9 @@ void main(void)
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);  // Se asigna reloj a puerto F
     //PORTF Y PORTD
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3); // Establecer los LEDS portF
-    GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_0 | GPIO_PIN_4 );  //PORT F PULLUP
-    GPIOPinTypeGPIOInput(GPIO_PORTD_BASE, GPIO_PIN_0 | GPIO_PIN_1 ); //PORT D  PULLUP
-    GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_0 | GPIO_PIN_4, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);   //Configurar el WeakPullup
-    GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_0 | GPIO_PIN_1, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);   //Configurar el WeakPullup
+    GPIOPinTypeGPIOInput(GPIO_PORTD_BASE,  GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 ); //PORT D  PULLUP
+    GPIOPadConfigSet(GPIO_PORTD_BASE,  GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    //Configurar el WeakPullup
 
     //UART
     SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);
@@ -71,12 +69,9 @@ void main(void)
     UARTIntEnable(UART1_BASE, GPIO_PIN_4 | GPIO_PIN_5);*/
 
     //Interrupcion del PORTF Y D
-    GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_0 | GPIO_PIN_4 ,GPIO_FALLING_EDGE); //HACER INT EN FALLING EDGE
-    GPIOIntTypeSet(GPIO_PORTD_BASE, GPIO_PIN_0 | GPIO_PIN_1 ,GPIO_FALLING_EDGE);
-    GPIOIntRegister(GPIO_PORTF_BASE, PortFIntHandler);  //FUNCION INT DE PORT F
+    GPIOIntTypeSet(GPIO_PORTD_BASE, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, GPIO_FALLING_EDGE);
     GPIOIntRegister(GPIO_PORTD_BASE, PortDIntHandler);  //FUNCION INT DE PORT D
-    GPIOIntEnable(GPIO_PORTF_BASE, GPIO_PIN_0 | GPIO_PIN_4 );
-    GPIOIntEnable(GPIO_PORTD_BASE, GPIO_PIN_0 | GPIO_PIN_1 );
+    GPIOIntEnable(GPIO_PORTD_BASE, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 );
 
     //Activar interrupciones generales
     IntMasterEnable();
@@ -134,90 +129,79 @@ void delayMs(uint32_t ui32Ms) {
 
     SysCtlDelay(ui32Ms * (SysCtlClockGet() / 3 / 1000));
 }
-void PortFIntHandler(void){
+
+void PortDIntHandler(void){ //Pines PD0, PD1, PD2, PD3
     uint32_t PinInt=0;
-
-    PinInt = GPIOIntStatus(GPIO_PORTF_BASE,true);
-
-
-    if( (PinInt & GPIO_INT_PIN_4) == GPIO_INT_PIN_4){
-      //Then there was a pin4 interrupt
-        if(GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4) == 0){
-
-                switch(parqueo1){
-                    case 48 :
-                     parqueo1 = 49;
-                     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x08);
-                     break;
-
-                    case 49 :
-                     parqueo1 = 48;
-                     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x00);
-                     break;
-
-                }
-
-            }
-    }
+    PinInt = GPIOIntStatus(GPIO_PORTD_BASE,true);
 
     if( (PinInt & GPIO_INT_PIN_0) == GPIO_INT_PIN_0){
       //Then there was a pin0 interrupt
-        if(GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0) == 0){
-            switch(parqueo2){
-                               case 48 :
-                                parqueo2 = 49;
-                                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x04);
-                                break;
-
-                               case 49 :
-                                parqueo2 = 48;
-                                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x00);
-                                break;
-            }
-
-        }
-    }
-    GPIOIntClear(GPIO_PORTF_BASE, PinInt);
-}
-void PortDIntHandler(void){
-    uint32_t PinInt=0;
-
-    PinInt = GPIOIntStatus(GPIO_PORTD_BASE,true);
-
-
-    if( (PinInt & GPIO_INT_PIN_0) == GPIO_INT_PIN_0){
-      //Then there was a pin4 interrupt
         if(GPIOPinRead(GPIO_PORTD_BASE, GPIO_PIN_0) == 0){
-            switch(parqueo3){
-                               case 48 :
-                                parqueo3 = 49;
-                                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x02);
-                                break;
-                               case 49 :
-                                parqueo3 = 48;
-                                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x00);
-                                break;
-
+            switch(parqueo1){
+                       case 48 :
+                        parqueo1 = 49;
+                        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x02);
+                        break;
+                       case 49 :
+                        parqueo1 = 48;
+                        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x00);
+                        break;
                            }
             }
     }
 
     if( (PinInt & GPIO_INT_PIN_1) == GPIO_INT_PIN_1){
       //Then there was a pin0 interrupt
-        if(GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0) == 0){
-            switch(parqueo4){
-                               case 48 :
-                                parqueo4 = 49;
-                                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x0A);
-                                break;
-                               case 49 :
-                                parqueo4 = 48;
-                                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x00);
-                                break;
+        if(GPIOPinRead(GPIO_PORTD_BASE, GPIO_PIN_1) == 0){
+            switch(parqueo2){
+                       case 48 :
+                        parqueo2 = 49;
+                        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x0A);
+                        break;
+                       case 49 :
+                        parqueo2 = 48;
+                        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x00);
+                        break;
 
                            }
         }
     }
+    if( (PinInt & GPIO_INT_PIN_2) == GPIO_INT_PIN_2){
+         //Then there was a pin2 interrupt
+           if(GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_2) == 0){
+
+                   switch(parqueo3){
+                       case 48 :
+                        parqueo3 = 49;
+                        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x08);
+                        break;
+
+                       case 49 :
+                        parqueo3 = 48;
+                        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x00);
+                        break;
+
+                   }
+
+               }
+       }
+
+       if( (PinInt & GPIO_INT_PIN_3) == GPIO_INT_PIN_3){
+         //Then there was a pin3 interrupt
+           if(GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_3) == 0){
+               switch(parqueo4){
+                                  case 48 :
+                                   parqueo4 = 49;
+                                   GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x04);
+                                   break;
+
+                                  case 49 :
+                                   parqueo4 = 48;
+                                   GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x00);
+                                   break;
+               }
+
+           }
     GPIOIntClear(GPIO_PORTD_BASE, PinInt);
 }
 
