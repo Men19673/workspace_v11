@@ -68,9 +68,9 @@ void main(void)
     //Configurar el WeakPullup
 
     //UART
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);    //Asignar reloj del UART1 y el GPIOC
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
-    GPIOPinConfigure(GPIO_PC4_U1RX);
+    GPIOPinConfigure(GPIO_PC4_U1RX); //Activar el pin muxing para UART
     GPIOPinConfigure(GPIO_PC5_U1TX);
     GPIOPinTypeUART(GPIO_PORTC_BASE, GPIO_PIN_4 | GPIO_PIN_5);
     UARTConfigSetExpClk(UART1_BASE, SysCtlClockGet(), 9600, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |UART_CONFIG_PAR_NONE));
@@ -102,21 +102,21 @@ void main(void)
 
                         switch (inSerial){
 
-                            case 65:
+                            case 65:    //Enviar parqueo 1 cuando recibe A
                                 outSerial = parqueo1;
                                 UARTCharPut(UART1_BASE,  outSerial);
                                 break;
 
-                            case 66:
+                            case 66:  //Enviar parqueo 2 cuando recibe B
                                 outSerial = parqueo2;
                                 UARTCharPut(UART1_BASE,  outSerial);
                                 break;
-                            case 67:
+                            case 67:  //Enviar parqueo 3 cuandor recibe C
                                 outSerial = parqueo3;
                                 UARTCharPut(UART1_BASE,  outSerial);
                                 break;
 
-                            case 68:
+                            case 68:  //Enviar parqueo 4 cuando recibe D
                                 outSerial = parqueo4;
                                 UARTCharPut(UART1_BASE,  outSerial);
                                 break;
@@ -140,8 +140,9 @@ void delayMs(uint32_t ui32Ms) {
 
 void PortDIntHandler(void){ //Pines PD0, PD1, PD2, PD3
     uint32_t PinInt=0;
-    PinInt = GPIOIntStatus(GPIO_PORTD_BASE, true);
+    PinInt = GPIOIntStatus(GPIO_PORTD_BASE, true); //Revisar que pin hizo interrupcion
 
+    //Realizar un antirrebote
     if(GPIOPinRead(GPIO_PORTD_BASE, GPIO_PIN_0) == 0){
                       PB0=1;
                   }
@@ -162,11 +163,11 @@ void PortDIntHandler(void){ //Pines PD0, PD1, PD2, PD3
             switch(parqueo1){
                        case 48 :
                         parqueo1 = 49;
-                        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_5, 0x20); //Rojo PB5
+                        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_5, 0x20); //Rojo
                         break;
                        case 49 :
                         parqueo1 = 48;
-                        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_5, 0x01); //Amamrillo PB0
+                        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_5, 0x01); //Amamrillo
                         break;
                            }
             PB0 = 0;
@@ -179,11 +180,11 @@ void PortDIntHandler(void){ //Pines PD0, PD1, PD2, PD3
             switch(parqueo2){
                        case 48 :
                         parqueo2 = 49;
-                        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_1 | GPIO_PIN_4, 0x02); //
+                        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_1 | GPIO_PIN_4, 0x02); // Amarillo
                         break;
                        case 49 :
                         parqueo2 = 48;
-                        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_1 | GPIO_PIN_4, 0x10);
+                        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_1 | GPIO_PIN_4, 0x10); //Rojo
                         break;
 
                            }
@@ -197,13 +198,13 @@ void PortDIntHandler(void){ //Pines PD0, PD1, PD2, PD3
                    switch(parqueo3){
                        case 48 :
                         parqueo3 = 49;
-                        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5, 0x20);
+                        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5, 0x20); //Amarillo
                         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0x00);
                         break;
 
                        case 49 :
                         parqueo3 = 48;
-                        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0x02);
+                        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0x02);    //Rojo
                         GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5, 0x00);
                         break;
                    }
@@ -217,12 +218,12 @@ void PortDIntHandler(void){ //Pines PD0, PD1, PD2, PD3
                switch(parqueo4){
                       case 48 :
                        parqueo4 = 49;
-                       GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6 | GPIO_PIN_7, 0x80);
+                       GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6 | GPIO_PIN_7, 0x80); //Amarillo
                        break;
 
                       case 49 :
                        parqueo4 = 48;
-                       GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6 | GPIO_PIN_7, 0x40);
+                       GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6 | GPIO_PIN_7, 0x40); //Rojo
                        break;
                }
                PB3=0;
@@ -232,24 +233,4 @@ void PortDIntHandler(void){ //Pines PD0, PD1, PD2, PD3
 }
 
 
-/*void UART1IntHandler(void){
-    inSerial = UARTCharGet(UART1_BASE);
-              switch (inSerial){
 
-                  case 65:
-                      UARTCharPut(UART7_BASE, parqueo1);
-                      break;
-
-                  case 66:
-                      UARTCharPut(UART7_BASE, parqueo2);
-                      break;
-                  case 67:
-                      UARTCharPut(UART7_BASE, parqueo3);
-                      break;
-
-                  case 68:
-                      UARTCharPut(UART7_BASE, parqueo4);
-                      break;
-                            }
-              UARTIntClear(UART1_BASE, GPIO_PIN_4 | GPIO_PIN_5 );
-}*/
